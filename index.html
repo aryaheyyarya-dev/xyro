@@ -1,596 +1,541 @@
-<!DOCTYPE html>
-<html lang="id">
+<!DOCTYPE html><html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Felix Pedia | Dashboard Modern + API Hub</title>
-    <!-- Google Fonts & Font Awesome -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Chart.js CDN untuk visualisasi -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background: #f0f2f8;
-            color: #1e293b;
-            padding-bottom: 80px;
-        }
-
-        /* SIDEBAR KIRI (seperti gaya kanan modern) */
-        .app-container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Sidebar premium */
-        .sidebar {
-            width: 280px;
-            background: linear-gradient(145deg, #0f172a 0%, #111827 100%);
-            backdrop-filter: blur(2px);
-            color: #e2e8f0;
-            padding: 2rem 1rem;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            overflow-y: auto;
-            transition: all 0.3s ease;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.08);
-            z-index: 20;
-        }
-
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 2.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        .logo-icon {
-            background: #3b82f6;
-            width: 42px;
-            height: 42px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.8rem;
-            box-shadow: 0 6px 12px -6px rgba(0,0,0,0.3);
-        }
-        .logo-text h2 {
-            font-size: 1.35rem;
-            font-weight: 700;
-            color: white;
-            letter-spacing: -0.3px;
-        }
-        .logo-text p {
-            font-size: 0.7rem;
-            opacity: 0.7;
-        }
-
-        .nav-menu {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: 0.2s;
-            color: #cbd5e1;
-            font-weight: 500;
-        }
-        .nav-item i {
-            width: 24px;
-            font-size: 1.2rem;
-        }
-        .nav-item.active {
-            background: #1e293b;
-            color: white;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-        .nav-item:hover:not(.active) {
-            background: #1e293b;
-            color: #f1f5f9;
-        }
-
-        /* main content area */
-        .main-content {
-            flex: 1;
-            padding: 1.8rem 2rem 2rem;
-            background: #f8fafc;
-        }
-
-        /* header cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        .stat-card {
-            background: white;
-            border-radius: 28px;
-            padding: 1.3rem 1.5rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.02), 0 2px 4px rgba(0,0,0,0.05);
-            border: 1px solid #eef2ff;
-            transition: transform 0.2s;
-        }
-        .stat-card:hover { transform: translateY(-3px);}
-        .stat-title { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; color: #5b6e8c; }
-        .stat-value { font-size: 2rem; font-weight: 800; color: #0f172a; margin-top: 8px; word-break: break-word; }
-        .stat-sub { font-size: 0.75rem; color: #4b5563; margin-top: 6px;}
-
-        /* panel modern */
-        .card-modern {
-            background: white;
-            border-radius: 28px;
-            padding: 1.5rem 1.8rem;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
-            border: 1px solid #eef2ff;
-            margin-bottom: 1.8rem;
-        }
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 1.2rem;
-            border-bottom: 2px solid #eef2ff;
-            padding-bottom: 0.75rem;
-        }
-        .badge-api {
-            background: #eef2ff;
-            padding: 6px 14px;
-            border-radius: 40px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            font-family: monospace;
-        }
-        .btn {
-            padding: 8px 18px;
-            border-radius: 40px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.2s;
-            background: #f1f5f9;
-        }
-        .btn-primary {
-            background: #3b82f6;
-            color: white;
-            box-shadow: 0 2px 6px rgba(59,130,246,0.3);
-        }
-        .btn-primary:hover { background: #2563eb; transform: scale(0.98);}
-        .btn-outline {
-            border: 1px solid #cbd5e1;
-            background: white;
-        }
-        .flex-between {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 12px;
-        }
-        .api-key-area {
-            background: #f1f5f9;
-            padding: 12px 18px;
-            border-radius: 60px;
-            font-family: monospace;
-            font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-        .service-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-top: 1rem;
-        }
-        .service-tag {
-            background: linear-gradient(135deg, #f1f5f9, #ffffff);
-            border: 1px solid #e2e8f0;
-            border-radius: 40px;
-            padding: 8px 20px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .service-tag:hover { background: #3b82f6; color: white; border-color:#3b82f6;}
-
-        .webhook-preview {
-            background: #0f172a;
-            color: #e2e8f0;
-            padding: 1rem;
-            border-radius: 20px;
-            font-family: monospace;
-            font-size: 0.8rem;
-        }
-
-        @media (max-width: 780px) {
-            .sidebar { width: 80px; padding: 1rem 0.5rem; }
-            .sidebar .logo-text, .sidebar .nav-item span:not(i) { display: none; }
-            .nav-item i { margin: 0 auto; font-size: 1.5rem; }
-            .nav-item { justify-content: center; }
-            .main-content { padding: 1rem; }
-        }
-        .footer-menu-mobile {
-            display: none;
-        }
-        @media (max-width: 680px) {
-            .footer-menu-mobile {
-                display: flex;
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: white;
-                border-top: 1px solid #e2e8f0;
-                justify-content: space-around;
-                padding: 12px 0;
-                z-index: 30;
-                backdrop-filter: blur(8px);
-            }
-            .sidebar { display: none; }
-            body { padding-bottom: 70px; }
-        }
-        .toast-msg {
-            position: fixed;
-            bottom: 90px;
-            right: 20px;
-            background: #1f2937;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 60px;
-            font-size: 0.85rem;
-            z-index: 200;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        }
-        textarea, input {
-            border-radius: 20px;
-            border: 1px solid #cbd5e1;
-            padding: 10px 16px;
-            outline: none;
-        }
-        hr { margin: 1rem 0; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOKOS OTP PANEL</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<div class="app-container">
-    <!-- Sidebar kiri modern -->
-    <div class="sidebar">
-        <div class="logo-area">
-            <div class="logo-icon"><i class="fas fa-crown"></i></div>
-            <div class="logo-text">
-                <h2>Felix Pedia</h2>
-                <p>Digital Mudah</p>
-            </div>
-        </div>
-        <div class="nav-menu">
-            <div class="nav-item active" data-tab="dashboard"><i class="fas fa-chart-line"></i> <span>Dashboard</span></div>
-            <div class="nav-item" data-tab="api-integration"><i class="fas fa-plug"></i> <span>API & Koneksi</span></div>
-            <div class="nav-item" data-tab="services"><i class="fas fa-mobile-alt"></i> <span>Layanan OTP</span></div>
-            <div class="nav-item" data-tab="bot-webhook"><i class="fab fa-telegram"></i> <span>Bot & Webhook</span></div>
-            <div class="nav-item" data-tab="profile"><i class="fas fa-user-circle"></i> <span>Profil</span></div>
-        </div>
-        <div style="margin-top: 2rem; font-size: 0.7rem; text-align: center; opacity: 0.5;">
-            <i class="fas fa-shield-alt"></i> API Ready v2
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-        <!-- TAB DASHBOARD -->
-        <div id="dashboardTab" class="tab-content">
-            <div class="stats-grid">
-                <div class="stat-card"><div class="stat-title"><i class="fas fa-wallet"></i> SALDO</div><div class="stat-value" id="saldoAmount">Rp0</div><div class="stat-sub">+ Top up via API</div></div>
-                <div class="stat-card"><div class="stat-title"><i class="fas fa-exchange-alt"></i> TOTAL TRANSAKSI</div><div class="stat-value" id="totalTransaksi">0</div><div class="stat-sub">Sukses / Gagal</div></div>
-                <div class="stat-card"><div class="stat-title"><i class="fas fa-shopping-cart"></i> TOTAL BELANJA</div><div class="stat-value" id="totalBelanja">Rp0</div><div class="stat-sub">OTP & Virtual</div></div>
-                <div class="stat-card"><div class="stat-title"><i class="fas fa-coins"></i> TOTAL DEPOSIT</div><div class="stat-value" id="totalDeposit">Rp0</div><div class="stat-sub">Riwayat deposit</div></div>
-            </div>
-            <div class="card-modern">
-                <div class="card-header"><h3><i class="fas fa-chart-simple"></i> Statistik Aktivitas</h3><span class="badge-api">update realtime</span></div>
-                <canvas id="activityChart" width="400" height="200" style="max-height: 220px; width:100%"></canvas>
-            </div>
-            <div class="card-modern">
-                <div class="flex-between"><h3><i class="fas fa-bolt"></i> Server Status & Produk</h3><button id="refreshServerBtn" class="btn btn-outline"><i class="fas fa-sync-alt"></i> Refresh</button></div>
-                <div id="serverStatusArea" class="flex-between" style="margin-top: 15px; gap: 12px;">
-                    <span>Server 1: <span id="server1Status" class="badge-api" style="background:#fee2e2;">MAINTENANCE</span></span>
-                    <span>Server 2: <span id="server2Status" class="badge-api" style="background:#dcfce7;">ONLINE</span></span>
-                </div>
-                <div style="margin-top: 20px;"><strong>Layanan Populer:</strong> WhatsApp, Telegram, Google, Social Media, Tiktok</div>
-                <button id="demoOrderBtn" class="btn btn-primary" style="margin-top: 15px;"><i class="fas fa-shopping-cart"></i> Beli Nomor Virtual (Demo)</button>
-            </div>
-        </div>
-
-        <!-- TAB API & KONEKSI (support generate API, create) -->
-        <div id="apiIntegrationTab" class="tab-content" style="display: none;">
-            <div class="card-modern">
-                <div class="card-header"><h3><i class="fas fa-key"></i> API Key Management (Generate / Create)</h3><button id="generateApiKeyBtn" class="btn btn-primary"><i class="fas fa-sync"></i> Generate API Key Baru</button></div>
-                <div class="api-key-area" style="background:#eef2ff; justify-content: space-between;">
-                    <span><i class="fas fa-code"></i> API KEY ANDA : </span>
-                    <strong id="apiKeyDisplay">fp_1723282_example</strong>
-                    <button id="copyApiKeyBtn" class="btn btn-outline" style="padding: 4px 14px;"><i class="far fa-copy"></i> Salin</button>
-                </div>
-                <p class="stat-sub" style="margin: 12px 0;">Gunakan API Key untuk mengakses endpoint integrasi. Simpan dengan aman. Endpoint: <code>https://api.felixpedia.my.id/v1/order</code></p>
-                <hr>
-                <h4><i class="fas fa-network-wired"></i> Integrasi & Endpoint Contoh</h4>
-                <div class="webhook-preview">
-                    POST /api/v1/create-order<br>
-                    Headers: { "X-API-Key": "your_key", "Content-Type": "application/json" }<br>
-                    Body: { "service": "whatsapp", "quantity": 1 }<br>
-                    Response: { "status": "success", "order_id": "FP789", "nomor": "+628123456789" }
-                </div>
-                <div style="margin-top: 20px;">
-                    <label>🔌 Test API Call (Create Order Simulasi):</label>
-                    <div class="flex-between" style="margin-top: 8px;">
-                        <select id="testServiceSelect" style="border-radius: 40px; padding: 8px;">
-                            <option value="whatsapp">WhatsApp OTP</option>
-                            <option value="telegram">Telegram OTP</option>
-                            <option value="google">Google Voice</option>
-                        </select>
-                        <button id="testApiCreateBtn" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Create Order (API)</button>
-                    </div>
-                    <div id="apiResponseMsg" style="margin-top: 12px; background:#f1f5f9; padding: 10px; border-radius: 20px; font-size: 0.8rem;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB LAYANAN OTP -->
-        <div id="servicesTab" class="tab-content" style="display: none;">
-            <div class="card-modern">
-                <h3><i class="fas fa-list-ul"></i> Layanan Nomor Virtual (OTP Fast Murah)</h3>
-                <div class="service-grid" id="serviceListContainer">
-                    <!-- akan diisi dinamis -->
-                </div>
-                <div style="margin-top: 20px;">
-                    <label>Pilih aplikasi & beli nomor:</label>
-                    <div class="flex-between"><input type="text" id="customServiceInput" placeholder="Cth: WhatsApp, Telegram" style="flex:1"><button id="beliNomorCustomBtn" class="btn btn-primary">Beli Sekarang</button></div>
-                    <div id="orderResultPreview" class="stat-sub" style="margin-top: 12px;"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB BOT & WEBHOOK TELEGRAM -->
-        <div id="botWebhookTab" class="tab-content" style="display: none;">
-            <div class="card-modern">
-                <h3><i class="fab fa-telegram"></i> Telegram Integration</h3>
-                <p>Kirim notifikasi order/produk via Bot Telegram. Masukkan Bot Token & Chat ID.</p>
-                <div style="display: flex; flex-direction: column; gap: 12px; max-width: 500px;">
-                    <input type="text" id="botTokenInput" placeholder="Bot Token: 123456:ABC-DEF" value="7890123456:AAHdemoTokenFelix">
-                    <input type="text" id="chatIdInput" placeholder="Chat ID: 123456789" value="-100123456789">
-                    <button id="saveTelegramBtn" class="btn btn-primary">Simpan & Test Webhook</button>
-                </div>
-                <div id="telegramStatusMsg" class="stat-sub" style="margin-top: 12px;"></div>
-                <div class="webhook-preview" style="margin-top: 18px;">
-                    <i class="fas fa-bell"></i> Webhook aktif: Notifikasi akan dikirim saat order berhasil dibuat.
-                </div>
-            </div>
-        </div>
-
-        <!-- TAB PROFIL (dengan informasi akun & logout) -->
-        <div id="profileTab" class="tab-content" style="display: none;">
-            <div class="card-modern">
-                <div class="flex-between"><h3><i class="fas fa-user-astronaut"></i> Profil Saya</h3><span class="badge-api">ID: #1779661357351</span></div>
-                <div><strong>Username:</strong> arya &nbsp;|&nbsp; <strong>Email:</strong> udinnnganteng42@gmail.com</div>
-                <div><strong>Status Akun:</strong> Aktif / Member &nbsp; <i class="fas fa-check-circle" style="color:#22c55e;"></i></div>
-                <hr>
-                <h4>Keamanan Akun</h4>
-                <input type="password" id="oldPass" placeholder="Password Lama" style="width:100%; margin-bottom: 10px;">
-                <input type="password" id="newPass" placeholder="Password Baru (min 4 karakter)" style="width:100%;">
-                <button id="updatePasswordBtn" class="btn btn-primary" style="margin-top: 5px;">Perbarui Password</button>
-                <hr>
-                <button id="logoutBtn" class="btn" style="background:#fee2e2; color:#b91c1c;"><i class="fas fa-sign-out-alt"></i> Keluar Sekarang</button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="footer-menu-mobile">
-    <i class="fas fa-home" data-tab="dashboard"></i>
-    <i class="fas fa-plug" data-tab="api-integration"></i>
-    <i class="fas fa-mobile-alt" data-tab="services"></i>
-    <i class="fas fa-robot" data-tab="bot-webhook"></i>
-    <i class="fas fa-user" data-tab="profile"></i>
+<body class="bg-slate-950 text-white min-h-screen">  <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center">
+    <div>
+      <h1 class="text-2xl font-bold">NOKOS OTP PANEL</h1>
+      <p class="text-sm text-slate-400">Provider OTP Otomatis</p>
+    </div><div class="flex gap-3">
+  <button class="bg-green-600 px-4 py-2 rounded-xl">Login</button>
+  <button class="bg-blue-600 px-4 py-2 rounded-xl">Register</button>
 </div>
 
-<script>
-    // -------------------- MOCK STATE (data support create/generate API)
-    let appState = {
-        apiKey: "fp_1723282_gen_" + Math.random().toString(36).substring(2,10),
-        balance: 125000,      // saldo demo
-        totalTransaksi: 12,
-        totalBelanja: 87500,
-        totalDeposit: 125000,
-        orders: [],
-        telegramConfig: { botToken: "7890123456:AAHdemoTokenFelix", chatId: "-100123456789" },
-        services: ["WhatsApp", "Telegram", "Google Voice", "TikTok", "Social Media", "LINE", "WeChat"]
-    };
-    
-    // Update UI numbers
-    function updateStatsUI() {
-        document.getElementById('saldoAmount').innerHTML = `Rp${appState.balance.toLocaleString()}`;
-        document.getElementById('totalTransaksi').innerText = appState.totalTransaksi;
-        document.getElementById('totalBelanja').innerHTML = `Rp${appState.totalBelanja.toLocaleString()}`;
-        document.getElementById('totalDeposit').innerHTML = `Rp${appState.totalDeposit.toLocaleString()}`;
-        if(document.getElementById('apiKeyDisplay')) document.getElementById('apiKeyDisplay').innerText = appState.apiKey;
+  </header>  <main class="p-6"><div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+
+  <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800">
+    <h2 class="text-slate-400">Saldo</h2>
+    <p class="text-3xl font-bold mt-2">Rp 0</p>
+  </div>
+
+  <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800">
+    <h2 class="text-slate-400">Total Order</h2>
+    <p class="text-3xl font-bold mt-2">0</p>
+  </div>
+
+  <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800">
+    <h2 class="text-slate-400">OTP Aktif</h2>
+    <p class="text-3xl font-bold mt-2">0</p>
+  </div>
+
+  <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800">
+    <h2 class="text-slate-400">Provider</h2>
+    <p class="text-3xl font-bold mt-2">ONLINE</p>
+  </div>
+
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+  <div class="lg:col-span-2 bg-slate-900 rounded-2xl border border-slate-800 p-6">
+
+    <h2 class="text-2xl font-bold mb-4">Beli Nomor OTP</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+      <div>
+        <label class="block mb-2 text-slate-400">Pilih Negara</label>
+        <select id="country" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700">
+          <option value="indonesia">Indonesia</option>
+          <option value="philippines">Philippines</option>
+          <option value="vietnam">Vietnam</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block mb-2 text-slate-400">Pilih Layanan</label>
+        <select id="service" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700">
+          <option value="wa">WhatsApp</option>
+          <option value="telegram">Telegram</option>
+          <option value="google">Google</option>
+          <option value="facebook">Facebook</option>
+        </select>
+      </div>
+
+    </div>
+
+    <button onclick="createOrder()" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 p-4 rounded-2xl font-bold">
+      BELI NOMOR OTP
+    </button>
+
+    <div id="result" class="mt-6 hidden bg-slate-800 p-5 rounded-2xl border border-slate-700">
+      <h3 class="text-xl font-bold mb-3">Detail Order</h3>
+
+      <div class="space-y-2">
+        <p>ID Order: <span id="orderId"></span></p>
+        <p>Nomor: <span id="number"></span></p>
+        <p>Status: <span id="status"></span></p>
+        <p>OTP: <span id="otp"></span></p>
+      </div>
+
+      <div class="flex gap-3 mt-5">
+        <button onclick="checkOtp()" class="bg-green-600 px-4 py-2 rounded-xl">
+          CEK OTP
+        </button>
+
+        <button onclick="cancelOrder()" class="bg-red-600 px-4 py-2 rounded-xl">
+          CANCEL
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6">
+
+    <h2 class="text-2xl font-bold mb-4">Riwayat</h2>
+
+    <div id="history" class="space-y-4">
+
+      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+        <p class="font-bold">WhatsApp</p>
+        <p class="text-sm text-slate-400">Belum ada transaksi</p>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="mt-8 bg-slate-900 rounded-2xl border border-slate-800 p-6">
+  <h2 class="text-2xl font-bold mb-5">API Produk Provider</h2>
+
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead>
+        <tr class="border-b border-slate-700">
+          <th class="text-left p-3">Produk</th>
+          <th class="text-left p-3">Harga</th>
+          <th class="text-left p-3">Status</th>
+        </tr>
+      </thead>
+
+      <tbody id="productTable">
+        <tr>
+          <td class="p-3">WhatsApp</td>
+          <td class="p-3">Rp 3.000</td>
+          <td class="p-3 text-green-400">READY</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+  </main><script>
+
+const API_KEY = 'ISI_API_KEY_PROVIDER'
+const BASE_URL = 'https://api-provider.com'
+
+let currentOrderId = null
+
+async function createOrder() {
+
+  const service = document.getElementById('service').value
+  const country = document.getElementById('country').value
+
+  try {
+
+    const response = await fetch(`${BASE_URL}/order`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': API_KEY
+      },
+      body: JSON.stringify({
+        service,
+        country
+      })
+    })
+
+    const data = await response.json()
+
+    currentOrderId = data.id
+
+    document.getElementById('result').classList.remove('hidden')
+
+    document.getElementById('orderId').innerText = data.id
+    document.getElementById('number').innerText = data.number
+    document.getElementById('status').innerText = 'WAITING OTP'
+    document.getElementById('otp').innerText = '-'
+
+    addHistory(service, data.number)
+
+    sendTelegramNotification(data)
+
+  } catch (e) {
+    alert('Gagal membuat order')
+  }
+}
+
+async function checkOtp() {
+
+  if (!currentOrderId) return
+
+  try {
+
+    const response = await fetch(`${BASE_URL}/status/${currentOrderId}`, {
+      headers: {
+        'Authorization': API_KEY
+      }
+    })
+
+    const data = await response.json()
+
+    document.getElementById('status').innerText = data.status
+    document.getElementById('otp').innerText = data.otp || '-'
+
+  } catch (e) {
+    alert('Gagal cek OTP')
+  }
+}
+
+async function cancelOrder() {
+
+  if (!currentOrderId) return
+
+  try {
+
+    await fetch(`${BASE_URL}/cancel`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': API_KEY
+      },
+      body: JSON.stringify({
+        id: currentOrderId
+      })
+    })
+
+    alert('Order dibatalkan')
+
+  } catch (e) {
+    alert('Gagal cancel')
+  }
+}
+
+function addHistory(service, number) {
+
+  const history = document.getElementById('history')
+
+  const div = document.createElement('div')
+
+  div.className = 'bg-slate-800 p-4 rounded-xl border border-slate-700'
+
+  div.innerHTML = `
+    <p class="font-bold">${service}</p>
+    <p class="text-sm text-slate-400">${number}</p>
+  `
+
+  history.prepend(div)
+}
+
+async function loadProducts() {
+
+  try {
+
+    const response = await fetch(`${BASE_URL}/products`, {
+      headers: {
+        'Authorization': API_KEY
+      }
+    })
+
+    const data = await response.json()
+
+    const table = document.getElementById('productTable')
+
+    table.innerHTML = ''
+
+    data.forEach(item => {
+
+      table.innerHTML += `
+        <tr class="border-b border-slate-800">
+          <td class="p-3">${item.name}</td>
+          <td class="p-3">Rp ${item.price}</td>
+          <td class="p-3 text-green-400">${item.status}</td>
+        </tr>
+      `
+    })
+
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+async function sendTelegramNotification(data) {
+
+  const BOT_TOKEN = 'ISI_BOT_TOKEN'
+  const CHAT_ID = 'ISI_CHAT_ID'
+
+  const text = `
+🛒 ORDER BARU
+
+ID: ${data.id}
+Nomor: ${data.number}
+Status: WAITING OTP
+  `
+
+  fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      chat_id: CHAT_ID,
+      text
+    })
+  })
+}
+
+loadProducts()
+
+</script><!-- LOGIN MODAL --><div id="loginModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
+  <div class="bg-slate-900 w-full max-w-md rounded-3xl p-6 border border-slate-800">
+    <h2 class="text-2xl font-bold mb-4">Login Panel</h2><input type="text" placeholder="Username" class="w-full bg-slate-800 p-4 rounded-2xl border border-slate-700 mb-4">
+<input type="password" placeholder="Password" class="w-full bg-slate-800 p-4 rounded-2xl border border-slate-700 mb-4">
+
+<button class="w-full bg-blue-600 p-4 rounded-2xl font-bold">
+  LOGIN
+</button>
+
+  </div>
+</div><footer class="mt-10 border-t border-slate-800 p-6 text-center text-slate-500">
+  © 2026 NOKOS OTP PANEL - ALL RIGHTS RESERVED==================================================== FULL BACKEND NODE.JS + MONGODB + API SYSTEM
+
+FOLDER STRUCTURE
+
+backend/ ├── index.js ├── package.json ├── .env ├── config/ │   └── database.js ├── models/ │   ├── User.js │   ├── Order.js │   └── Deposit.js ├── routes/ │   ├── auth.js │   ├── order.js │   ├── deposit.js │   └── admin.js ├── provider/ │   ├── murbug.js │   └── vaksms.js └── middleware/ └── auth.js
+
+==================================================== INSTALL MODULE
+
+npm init -y npm install express mongoose axios cors dotenv jsonwebtoken bcryptjs
+
+==================================================== FILE .env
+
+PORT=3000 MONGO_URL=mongodb://127.0.0.1:27017/nokos JWT_SECRET=SECRET QRIS_API_KEY=ISI_API_KEY MURBUG_API=https://api-provider.com MURBUG_KEY=ISI_KEY
+
+==================================================== FILE index.js
+
+const express = require('express') const mongoose = require('mongoose') const cors = require('cors') require('dotenv').config()
+
+const app = express()
+
+app.use(cors()) app.use(express.json())
+
+mongoose.connect(process.env.MONGO_URL)
+
+app.use('/api/auth', require('./routes/auth')) app.use('/api/order', require('./routes/order')) app.use('/api/deposit', require('./routes/deposit')) app.use('/api/admin', require('./routes/admin'))
+
+app.listen(process.env.PORT, () => { console.log('SERVER RUNNING') })
+
+==================================================== MODEL USER
+
+const mongoose = require('mongoose')
+
+const userSchema = new mongoose.Schema({ username: String, password: String, balance: { type: Number, default: 0 }, role: { type: String, default: 'user' } })
+
+module.exports = mongoose.model('users', userSchema)
+
+==================================================== MODEL ORDER
+
+const mongoose = require('mongoose')
+
+const orderSchema = new mongoose.Schema({ userId: String, provider: String, service: String, number: String, otp: String, status: String, createdAt: { type: Date, default: Date.now } })
+
+module.exports = mongoose.model('orders', orderSchema)
+
+==================================================== ROUTE ORDER API
+
+const router = require('express').Router() const axios = require('axios') const Order = require('../models/Order') const User = require('../models/User')
+
+router.post('/create', async (req, res) => {
+
+const { userId, service, provider } = req.body
+
+const user = await User.findById(userId)
+
+if (user.balance < 5000) { return res.json({ status: false, message: 'Saldo tidak cukup' }) }
+
+const response = await axios.post(${process.env.MURBUG_API}/order, { service }, { headers: { Authorization: process.env.MURBUG_KEY } })
+
+const data = response.data
+
+user.balance -= 5000 await user.save()
+
+await Order.create({ userId, provider, service, number: data.number, status: 'waiting' })
+
+res.json(data) })
+
+module.exports = router
+
+==================================================== AUTO DEPOSIT QRIS
+
+const router = require('express').Router() const Deposit = require('../models/Deposit')
+
+router.post('/qris', async (req, res) => {
+
+const { amount } = req.body
+
+const invoice = { id: Date.now(), amount, qr_string: '00020101021126670016COM.NOBUBANK.WWW011893600503000008791402145502181234567890303UMI51440014ID.CO.QRIS.WWW0215ID1024324430303UMI5204541153033605802ID5910NOKOS OTP6013JAKARTA BARAT6105111116304A13A' }
+
+res.json({ status: true, data: invoice }) })
+
+module.exports = router
+
+==================================================== ADMIN DASHBOARD FEATURES
+
+Statistik user
+
+Total order
+
+Total deposit
+
+Total profit
+
+Tambah provider
+
+Edit harga produk
+
+Ban user
+
+Tambah saldo
+
+Withdraw user
+
+Monitor OTP realtime
+
+API monitoring
+
+
+==================================================== MULTI PROVIDER SUPPORT
+
+SUPPORTED:
+
+Murbug
+
+VakSMS
+
+SMSHub
+
+5SIM
+
+GrizzlySMS
+
+SMSActivate
+
+DaisySMS
+
+
+==================================================== API SENDIRI
+
+POST /api/order/create GET /api/order/status/:id POST /api/order/cancel GET /api/products POST /api/deposit/qris GET /api/user/profile
+
+==================================================== DEPLOY VPS UBUNTU
+
+apt update && apt upgrade -y apt install nodejs npm mongodb -y
+
+mkdir nokos cd nokos
+
+npm install
+
+node index.js
+
+==================================================== NGINX DOMAIN
+
+apt install nginx -y
+
+nano /etc/nginx/sites-available/default
+
+server { listen 80; server_name domain.com;
+
+location / {
+    proxy_pass http://localhost:3000;
+}
+
+}
+
+systemctl restart nginx
+
+==================================================== FITUR TAMBAHAN
+
+Login register JWT
+
+Referral system
+
+Reseller panel
+
+Auto OTP refresh
+
+Auto webhook
+
+Telegram notification
+
+Discord webhook
+
+API logs
+
+Anti spam
+
+Captcha
+
+Dark mode
+
+Light mode
+
+Mobile responsive
+
+PWA support
+
+Real-time socket
+
+
+</footer><script>
+
+function openLogin() {
+  document.getElementById('loginModal').classList.remove('hidden')
+}
+
+function closeLogin() {
+  document.getElementById('loginModal').classList.add('hidden')
+}
+
+setInterval(async () => {
+
+  if (!currentOrderId) return
+
+  try {
+
+    const response = await fetch(`${BASE_URL}/status/${currentOrderId}`, {
+      headers: {
+        'Authorization': API_KEY
+      }
+    })
+
+    const data = await response.json()
+
+    if (data.otp) {
+      document.getElementById('otp').innerText = data.otp
+      document.getElementById('status').innerText = 'OTP RECEIVED'
     }
-    
-    // Generate API Key baru (Create)
-    function regenerateApiKey() {
-        let newKey = "fp_key_" + Math.random().toString(36).substring(2,15) + "_" + Date.now().toString(36);
-        appState.apiKey = newKey;
-        updateStatsUI();
-        showToast("API Key baru berhasil dibuat! Simpan dengan aman.");
-        if(document.getElementById('apiKeyDisplay')) document.getElementById('apiKeyDisplay').innerText = appState.apiKey;
-    }
-    
-    // Simulasi create order via API support
-    function createOrderViaAPI(serviceName) {
-        if(appState.balance < 2000) {
-            showToast("Saldo tidak mencukupi (min Rp2000), silakan deposit demo.");
-            return { success: false, msg: "Saldo rendah" };
-        }
-        let harga = 1800; // harga simulasi
-        appState.balance -= harga;
-        appState.totalBelanja += harga;
-        appState.totalTransaksi += 1;
-        let orderId = "FP" + Math.floor(Math.random()*10000);
-        let virtualNumber = "+62" + Math.floor(8000000000 + Math.random()*1000000000);
-        let newOrder = { id: orderId, service: serviceName, nomor: virtualNumber, date: new Date().toLocaleString(), harga: harga };
-        appState.orders.unshift(newOrder);
-        updateStatsUI();
-        // Notifikasi Telegram (simulasi)
-        sendTelegramNotif(`🔔 ORDER BARU! Layanan: ${serviceName}\nNomor: ${virtualNumber}\nHarga: Rp${harga}\nID: ${orderId}`);
-        showToast(`Berhasil beli ${serviceName} - Nomor: ${virtualNumber}`);
-        return { success: true, order: newOrder };
-    }
-    
-    function sendTelegramNotif(message) {
-        let { botToken, chatId } = appState.telegramConfig;
-        if(botToken && chatId && botToken !== "") {
-            console.log(`[Telegram Mock] Notif ke ${chatId}: ${message}`);
-            // Simulasi pengiriman (tidak HTTP aktual tapi demo)
-            let statusDiv = document.getElementById('telegramStatusMsg');
-            if(statusDiv) statusDiv.innerHTML = `<i class="fas fa-paper-plane"></i> Notifikasi terkirim (simulasi): ${message.substring(0,40)}...`;
-            setTimeout(()=>{ if(statusDiv) statusDiv.innerHTML = "✅ Terintegrasi dengan Bot Telegram."; }, 1500);
-        } else {
-            console.log("Telegram not configured");
-        }
-    }
-    
-    // load services list UI
-    function renderServices() {
-        let container = document.getElementById('serviceListContainer');
-        if(container){
-            container.innerHTML = appState.services.map(s => `<div class="service-tag" data-srv="${s}">${s} <i class="fas fa-phone"></i></div>`).join('');
-            document.querySelectorAll('.service-tag').forEach(el => {
-                el.addEventListener('click', (e) => {
-                    let srv = el.getAttribute('data-srv');
-                    createOrderViaAPI(srv);
-                    if(document.getElementById('orderResultPreview')) document.getElementById('orderResultPreview').innerHTML = `✅ Order ${srv} diproses. Cek riwayat.`;
-                });
-            });
-        }
-    }
-    
-    function initCharts() {
-        const ctx = document.getElementById('activityChart')?.getContext('2d');
-        if(ctx) {
-            new Chart(ctx, {
-                type: 'line',
-                data: { labels: ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'], datasets: [{ label: 'Transaksi OTP', data: [3, 5, 2, 7, 4, 6, 2], borderColor: '#3b82f6', tension: 0.3, fill: false }] },
-                options: { responsive: true, maintainAspectRatio: true }
-            });
-        }
-    }
-    
-    function showToast(msg) {
-        let toast = document.createElement('div');
-        toast.className = 'toast-msg';
-        toast.innerHTML = `<i class="fas fa-info-circle"></i> ${msg}`;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2500);
-    }
-    
-    // Event handlers + Tab switching
-    function switchTab(tabId) {
-        document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
-        document.getElementById(tabId + 'Tab').style.display = 'block';
-        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-        document.querySelectorAll(`.nav-item[data-tab="${tabId}"]`).forEach(el => el.classList.add('active'));
-        if(tabId === 'services') renderServices();
-        if(tabId === 'api-integration') updateStatsUI();
-    }
-    
-    // binding semua event
-    document.querySelectorAll('.nav-item').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            let tab = btn.getAttribute('data-tab');
-            if(tab) switchTab(tab);
-        });
-    });
-    document.querySelectorAll('.footer-menu-mobile i').forEach(icon => {
-        icon.addEventListener('click', (e) => {
-            let tab = icon.getAttribute('data-tab');
-            if(tab) switchTab(tab);
-        });
-    });
-    
-    // Initial event listeners
-    document.getElementById('generateApiKeyBtn')?.addEventListener('click', () => regenerateApiKey());
-    document.getElementById('copyApiKeyBtn')?.addEventListener('click', () => {
-        navigator.clipboard.writeText(appState.apiKey);
-        showToast("API Key disalin ke clipboard!");
-    });
-    document.getElementById('testApiCreateBtn')?.addEventListener('click', () => {
-        let service = document.getElementById('testServiceSelect').value;
-        let res = createOrderViaAPI(service);
-        let respDiv = document.getElementById('apiResponseMsg');
-        if(res.success) respDiv.innerHTML = `<span style="color:green;">✅ Sukses: Order ${res.order.id} dibuat. Nomor: ${res.order.nomor}</span>`;
-        else respDiv.innerHTML = `<span style="color:red;">❌ Gagal: ${res.msg}</span>`;
-        switchTab('dashboard'); // redirect ke dashboard agar lihat update saldo
-        setTimeout(()=> switchTab('api-integration'), 800);
-    });
-    document.getElementById('saveTelegramBtn')?.addEventListener('click', () => {
-        let botTok = document.getElementById('botTokenInput').value;
-        let chatIdVal = document.getElementById('chatIdInput').value;
-        appState.telegramConfig = { botToken: botTok, chatId: chatIdVal };
-        showToast("Pengaturan Telegram & Webhook disimpan");
-        sendTelegramNotif("✅ Webhook Felix Pedia aktif! Notifikasi order akan dikirim.");
-    });
-    document.getElementById('beliNomorCustomBtn')?.addEventListener('click', () => {
-        let custom = document.getElementById('customServiceInput').value;
-        if(custom.trim() === "") return showToast("Masukkan nama layanan");
-        createOrderViaAPI(custom);
-    });
-    document.getElementById('demoOrderBtn')?.addEventListener('click', () => {
-        createOrderViaAPI("WhatsApp (Demo)");
-    });
-    document.getElementById('refreshServerBtn')?.addEventListener('click', () => {
-        let rand1 = Math.random() > 0.5 ? "ONLINE" : "MAINTENANCE";
-        let rand2 = "ONLINE";
-        document.getElementById('server1Status').innerText = rand1;
-        document.getElementById('server1Status').style.background = rand1 === "ONLINE" ? "#dcfce7" : "#fee2e2";
-        document.getElementById('server2Status').innerText = rand2;
-        showToast("Server status diperbarui.");
-    });
-    document.getElementById('updatePasswordBtn')?.addEventListener('click', () => {
-        let old = document.getElementById('oldPass').value;
-        let newp = document.getElementById('newPass').value;
-        if(newp.length < 4) return showToast("Password baru minimal 4 karakter");
-        if(old === "") return showToast("Masukkan password lama");
-        showToast("Password berhasil diperbarui! (simulasi)");
-        document.getElementById('oldPass').value = "";
-        document.getElementById('newPass').value = "";
-    });
-    document.getElementById('logoutBtn')?.addEventListener('click', () => {
-        showToast("Anda telah keluar dari sesi. (Demo logout)");
-        setTimeout(() => location.reload(), 1000);
-    });
-    // set default server status
-    document.getElementById('server1Status').innerText = "MAINTENANCE";
-    document.getElementById('server2Status').innerText = "ONLINE";
-    updateStatsUI();
-    renderServices();
-    initCharts();
-    switchTab('dashboard');
-    // tambahan event untuk riwayat dari order tersimpan
-    console.log("Felix Pedia Dashboard Modern + API ready | Generate & Create");
-</script>
-</body>
+
+  } catch (e) {
+    console.log(e)
+  }
+
+}, 5000)
+
+</script></body>
 </html>
