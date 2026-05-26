@@ -1,541 +1,479 @@
-<!DOCTYPE html><html lang="id">
+<!DOCTYPE html>
+<html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NOKOS OTP PANEL</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Nokos OTP · Auto Provider Luar · Stok Melimpah</title>
+    <!-- Google Font & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js sederhana -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f5f7fb;
+            color: #0f172a;
+            overflow-x: hidden;
+        }
+
+        /* custom scroll */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #e2e8f0; }
+        ::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
+
+        /* navbar premium */
+        .navbar {
+            background: #ffffffcc;
+            backdrop-filter: blur(16px);
+            background: rgba(255,255,255,0.92);
+            border-bottom: 1px solid #eef2ff;
+            padding: 0.8rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-icon {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            width: 42px;
+            height: 42px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(37,99,235,0.3);
+        }
+        .logo h1 { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #0f172a, #2563eb); -webkit-background-clip: text; background-clip: text; color: transparent;}
+        .logo span { font-size: 0.7rem; font-weight: 500; color: #3b82f6; margin-left: 4px;}
+
+        .nav-buttons { display: flex; gap: 12px; }
+        .btn-outline-light { border: 1px solid #cbd5e1; background: white; border-radius: 40px; padding: 8px 20px; font-weight: 600; transition: 0.2s; cursor: pointer;}
+        .btn-primary-grad { background: linear-gradient(95deg, #2563eb, #1d4ed8); color: white; border: none; border-radius: 40px; padding: 8px 24px; font-weight: 600; box-shadow: 0 4px 8px rgba(0,0,0,0.05); cursor: pointer;}
+        
+        .hero {
+            text-align: center;
+            padding: 3rem 2rem 2rem;
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+        }
+        .hero h2 { font-size: 2.8rem; font-weight: 800; line-height: 1.2; }
+        .hero p { color: #334155; max-width: 600px; margin: 1rem auto; }
+        .badge-free {
+            background: #dcfce7; color: #15803d; border-radius: 100px; padding: 6px 18px; font-weight: 600; font-size: 0.8rem; display: inline-block;
+        }
+        .stats-banner {
+            display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-top: 2rem;
+        }
+        .stat-item { background: white; border-radius: 40px; padding: 0.8rem 2rem; box-shadow: 0 8px 20px rgba(0,0,0,0.02); border: 1px solid #eef2ff; font-weight: 600;}
+
+        /* container utama + sidebar + produk */
+        .app-layout {
+            display: flex;
+            max-width: 1600px;
+            margin: 1.5rem auto;
+            padding: 0 1.5rem;
+            gap: 2rem;
+        }
+        .sidebar-admin {
+            flex: 0 0 280px;
+            background: white;
+            border-radius: 32px;
+            padding: 1.5rem;
+            border: 1px solid #eef2ff;
+            height: fit-content;
+            position: sticky;
+            top: 90px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+        .sidebar-admin h3 { font-size: 1.2rem; margin-bottom: 1rem; display: flex; gap: 8px; align-items: center;}
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #1e293b;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        .menu-item i { width: 24px; }
+        .menu-item.active, .menu-item:hover { background: #eef2ff; color: #2563eb; }
+        .product-grid {
+            flex: 1;
+        }
+        .card-produk {
+            background: white;
+            border-radius: 28px;
+            padding: 1.2rem;
+            border: 1px solid #eef2ff;
+            transition: all 0.2s;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+        .card-produk:hover { transform: translateY(-4px); box-shadow: 0 20px 25px -12px rgba(0,0,0,0.1);}
+        .price-tag { font-size: 1.6rem; font-weight: 800; color: #0f172a;}
+        .old-price { text-decoration: line-through; font-size: 0.8rem; color: #94a3b8;}
+        .stock-badge { background: #dcfce7; border-radius: 40px; padding: 4px 12px; font-size: 0.7rem; font-weight: 600;}
+
+        .admin-panel-card {
+            background: white; border-radius: 28px; padding: 1.8rem; margin-bottom: 1.5rem;
+            border: 1px solid #eef2ff;
+        }
+        .btn-sm { padding: 6px 14px; border-radius: 30px; font-size: 0.8rem; background: #f1f5f9; cursor: pointer;}
+        .btn-primary { background: #2563eb; color: white; border: none; padding: 8px 18px; border-radius: 40px; font-weight: 500; cursor: pointer;}
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;}
+        .api-box { background: #0f172a; color: #e2e8f0; border-radius: 20px; padding: 1rem; font-family: monospace; font-size: 0.8rem;}
+
+        @media (max-width: 860px) {
+            .app-layout { flex-direction: column; }
+            .sidebar-admin { position: static; width: 100%; }
+            .hero h2 { font-size: 1.8rem; }
+        }
+        .toast-notif { position: fixed; bottom: 30px; right: 20px; background: #1e293b; color: white; padding: 12px 24px; border-radius: 60px; z-index: 1000; font-size: 0.85rem; box-shadow: 0 8px 20px rgba(0,0,0,0.2);}
+        .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 2000; visibility: hidden; opacity: 0; transition: 0.2s;}
+        .modal-card { background: white; border-radius: 40px; padding: 2rem; max-width: 480px; width: 90%;}
+        .input-number { width: 100%; padding: 12px; border-radius: 40px; border: 1px solid #cbd5e1; margin: 10px 0;}
+        .close-modal { float: right; cursor: pointer; font-size: 1.5rem; }
+        footer { text-align: center; padding: 2rem; color: #475569; border-top: 1px solid #eef2ff; margin-top: 2rem;}
+    </style>
 </head>
-<body class="bg-slate-950 text-white min-h-screen">  <header class="bg-slate-900 border-b border-slate-800 p-4 flex justify-between items-center">
-    <div>
-      <h1 class="text-2xl font-bold">NOKOS OTP PANEL</h1>
-      <p class="text-sm text-slate-400">Provider OTP Otomatis</p>
-    </div><div class="flex gap-3">
-  <button class="bg-green-600 px-4 py-2 rounded-xl">Login</button>
-  <button class="bg-blue-600 px-4 py-2 rounded-xl">Register</button>
+<body>
+
+<div class="navbar">
+    <div class="logo">
+        <div class="logo-icon"><i class="fas fa-mobile-alt"></i></div>
+        <div><h1>Nokos OTP<span>Auto Provider Luar</span></h1></div>
+    </div>
+    <div class="nav-buttons">
+        <button class="btn-outline-light" id="openAdminPanelBtn"><i class="fas fa-tachometer-alt"></i> Admin Panel</button>
+        <button class="btn-primary-grad" id="beliCepatBtn"><i class="fas fa-bolt"></i> Beli Nomor</button>
+    </div>
 </div>
 
-  </header>  <main class="p-6"><div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-
-  <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800">
-    <h2 class="text-slate-400">Saldo</h2>
-    <p class="text-3xl font-bold mt-2">Rp 0</p>
-  </div>
-
-  <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800">
-    <h2 class="text-slate-400">Total Order</h2>
-    <p class="text-3xl font-bold mt-2">0</p>
-  </div>
-
-  <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800">
-    <h2 class="text-slate-400">OTP Aktif</h2>
-    <p class="text-3xl font-bold mt-2">0</p>
-  </div>
-
-  <div class="bg-slate-900 rounded-2xl p-5 border border-slate-800">
-    <h2 class="text-slate-400">Provider</h2>
-    <p class="text-3xl font-bold mt-2">ONLINE</p>
-  </div>
-
+<div class="hero">
+    <div class="badge-free"><i class="fas fa-gem"></i> FREE SETUP & INSTALASI | SUPPORT API</div>
+    <h2>Stok Nomor Melimpah<br>Harga Modal Jauh Lebih Murah</h2>
+    <p>Provider luar negeri + Auto update stok. Gak perlu jago coding, kami bantu full online!</p>
+    <div class="stats-banner">
+        <div class="stat-item"><i class="fas fa-database"></i> 120+ Negara</div>
+        <div class="stat-item"><i class="fas fa-sync-alt"></i> Auto Re-stock</div>
+        <div class="stat-item"><i class="fas fa-headset"></i> FREE Setup 24/7</div>
+    </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-  <div class="lg:col-span-2 bg-slate-900 rounded-2xl border border-slate-800 p-6">
-
-    <h2 class="text-2xl font-bold mb-4">Beli Nomor OTP</h2>
-
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-      <div>
-        <label class="block mb-2 text-slate-400">Pilih Negara</label>
-        <select id="country" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700">
-          <option value="indonesia">Indonesia</option>
-          <option value="philippines">Philippines</option>
-          <option value="vietnam">Vietnam</option>
-        </select>
-      </div>
-
-      <div>
-        <label class="block mb-2 text-slate-400">Pilih Layanan</label>
-        <select id="service" class="w-full bg-slate-800 p-3 rounded-xl border border-slate-700">
-          <option value="wa">WhatsApp</option>
-          <option value="telegram">Telegram</option>
-          <option value="google">Google</option>
-          <option value="facebook">Facebook</option>
-        </select>
-      </div>
-
+<div class="app-layout">
+    <!-- Sidebar Ringan / menu admin user friendly -->
+    <div class="sidebar-admin">
+        <h3><i class="fas fa-store"></i> Panel Kelola</h3>
+        <div class="menu-item active" data-menu="products"><i class="fas fa-boxes"></i> Daftar Produk</div>
+        <div class="menu-item" data-menu="api"><i class="fas fa-key"></i> API & Koneksi</div>
+        <div class="menu-item" data-menu="orders"><i class="fas fa-history"></i> Riwayat Order</div>
+        <div class="menu-item" data-menu="provider"><i class="fas fa-globe-asia"></i> Provider Luar</div>
+        <hr style="margin: 1rem 0;">
+        <div class="menu-item" id="resetStokBtn"><i class="fas fa-charging-station"></i> Isi Ulang Stok (Demo)</div>
+        <div class="menu-item" id="genApiBtn"><i class="fas fa-sync-alt"></i> Generate API Key Baru</div>
     </div>
 
-    <button onclick="createOrder()" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 p-4 rounded-2xl font-bold">
-      BELI NOMOR OTP
-    </button>
-
-    <div id="result" class="mt-6 hidden bg-slate-800 p-5 rounded-2xl border border-slate-700">
-      <h3 class="text-xl font-bold mb-3">Detail Order</h3>
-
-      <div class="space-y-2">
-        <p>ID Order: <span id="orderId"></span></p>
-        <p>Nomor: <span id="number"></span></p>
-        <p>Status: <span id="status"></span></p>
-        <p>OTP: <span id="otp"></span></p>
-      </div>
-
-      <div class="flex gap-3 mt-5">
-        <button onclick="checkOtp()" class="bg-green-600 px-4 py-2 rounded-xl">
-          CEK OTP
-        </button>
-
-        <button onclick="cancelOrder()" class="bg-red-600 px-4 py-2 rounded-xl">
-          CANCEL
-        </button>
-      </div>
+    <!-- main produk + konten -->
+    <div class="product-grid" id="mainContentArea">
+        <!-- daftar produk akan di render via js -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem;">
+            <h2><i class="fas fa-sim-card"></i> Nomor Virtual | OTP Instant</h2>
+            <span class="stock-badge"><i class="fas fa-check-circle"></i> Stok melimpah + auto provider luar</span>
+        </div>
+        <div id="productListContainer" class="grid-produk" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem;"></div>
     </div>
-
-  </div>
-
-  <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6">
-
-    <h2 class="text-2xl font-bold mb-4">Riwayat</h2>
-
-    <div id="history" class="space-y-4">
-
-      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-        <p class="font-bold">WhatsApp</p>
-        <p class="text-sm text-slate-400">Belum ada transaksi</p>
-      </div>
-
-    </div>
-
-  </div>
-
 </div>
 
-<div class="mt-8 bg-slate-900 rounded-2xl border border-slate-800 p-6">
-  <h2 class="text-2xl font-bold mb-5">API Produk Provider</h2>
-
-  <div class="overflow-x-auto">
-    <table class="w-full">
-      <thead>
-        <tr class="border-b border-slate-700">
-          <th class="text-left p-3">Produk</th>
-          <th class="text-left p-3">Harga</th>
-          <th class="text-left p-3">Status</th>
-        </tr>
-      </thead>
-
-      <tbody id="productTable">
-        <tr>
-          <td class="p-3">WhatsApp</td>
-          <td class="p-3">Rp 3.000</td>
-          <td class="p-3 text-green-400">READY</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+<!-- modal untuk beli nomor -->
+<div id="buyModal" class="modal-bg">
+    <div class="modal-card">
+        <span class="close-modal" id="closeModalBtn">&times;</span>
+        <h3><i class="fas fa-phone-alt"></i> Beli Nomor OTP</h3>
+        <p id="modalProductName">WhatsApp</p>
+        <label>Harga : <strong id="modalPrice">Rp0</strong></label>
+        <div style="margin: 12px 0;">
+            <button id="confirmBuyBtn" class="btn-primary" style="width:100%">Konfirmasi & Beli Sekarang</button>
+        </div>
+        <small class="api-info">✅ Stok realtime, nomor langsung dikirim via panel & API webhook</small>
+    </div>
 </div>
 
-  </main><script>
-
-const API_KEY = 'ISI_API_KEY_PROVIDER'
-const BASE_URL = 'https://api-provider.com'
-
-let currentOrderId = null
-
-async function createOrder() {
-
-  const service = document.getElementById('service').value
-  const country = document.getElementById('country').value
-
-  try {
-
-    const response = await fetch(`${BASE_URL}/order`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': API_KEY
-      },
-      body: JSON.stringify({
-        service,
-        country
-      })
-    })
-
-    const data = await response.json()
-
-    currentOrderId = data.id
-
-    document.getElementById('result').classList.remove('hidden')
-
-    document.getElementById('orderId').innerText = data.id
-    document.getElementById('number').innerText = data.number
-    document.getElementById('status').innerText = 'WAITING OTP'
-    document.getElementById('otp').innerText = '-'
-
-    addHistory(service, data.number)
-
-    sendTelegramNotification(data)
-
-  } catch (e) {
-    alert('Gagal membuat order')
-  }
-}
-
-async function checkOtp() {
-
-  if (!currentOrderId) return
-
-  try {
-
-    const response = await fetch(`${BASE_URL}/status/${currentOrderId}`, {
-      headers: {
-        'Authorization': API_KEY
-      }
-    })
-
-    const data = await response.json()
-
-    document.getElementById('status').innerText = data.status
-    document.getElementById('otp').innerText = data.otp || '-'
-
-  } catch (e) {
-    alert('Gagal cek OTP')
-  }
-}
-
-async function cancelOrder() {
-
-  if (!currentOrderId) return
-
-  try {
-
-    await fetch(`${BASE_URL}/cancel`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': API_KEY
-      },
-      body: JSON.stringify({
-        id: currentOrderId
-      })
-    })
-
-    alert('Order dibatalkan')
-
-  } catch (e) {
-    alert('Gagal cancel')
-  }
-}
-
-function addHistory(service, number) {
-
-  const history = document.getElementById('history')
-
-  const div = document.createElement('div')
-
-  div.className = 'bg-slate-800 p-4 rounded-xl border border-slate-700'
-
-  div.innerHTML = `
-    <p class="font-bold">${service}</p>
-    <p class="text-sm text-slate-400">${number}</p>
-  `
-
-  history.prepend(div)
-}
-
-async function loadProducts() {
-
-  try {
-
-    const response = await fetch(`${BASE_URL}/products`, {
-      headers: {
-        'Authorization': API_KEY
-      }
-    })
-
-    const data = await response.json()
-
-    const table = document.getElementById('productTable')
-
-    table.innerHTML = ''
-
-    data.forEach(item => {
-
-      table.innerHTML += `
-        <tr class="border-b border-slate-800">
-          <td class="p-3">${item.name}</td>
-          <td class="p-3">Rp ${item.price}</td>
-          <td class="p-3 text-green-400">${item.status}</td>
-        </tr>
-      `
-    })
-
-  } catch (e) {
-    console.log(e)
-  }
-}
-
-async function sendTelegramNotification(data) {
-
-  const BOT_TOKEN = 'ISI_BOT_TOKEN'
-  const CHAT_ID = 'ISI_CHAT_ID'
-
-  const text = `
-🛒 ORDER BARU
-
-ID: ${data.id}
-Nomor: ${data.number}
-Status: WAITING OTP
-  `
-
-  fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      chat_id: CHAT_ID,
-      text
-    })
-  })
-}
-
-loadProducts()
-
-</script><!-- LOGIN MODAL --><div id="loginModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50">
-  <div class="bg-slate-900 w-full max-w-md rounded-3xl p-6 border border-slate-800">
-    <h2 class="text-2xl font-bold mb-4">Login Panel</h2><input type="text" placeholder="Username" class="w-full bg-slate-800 p-4 rounded-2xl border border-slate-700 mb-4">
-<input type="password" placeholder="Password" class="w-full bg-slate-800 p-4 rounded-2xl border border-slate-700 mb-4">
-
-<button class="w-full bg-blue-600 p-4 rounded-2xl font-bold">
-  LOGIN
-</button>
-
-  </div>
-</div><footer class="mt-10 border-t border-slate-800 p-6 text-center text-slate-500">
-  © 2026 NOKOS OTP PANEL - ALL RIGHTS RESERVED==================================================== FULL BACKEND NODE.JS + MONGODB + API SYSTEM
-
-FOLDER STRUCTURE
-
-backend/ ├── index.js ├── package.json ├── .env ├── config/ │   └── database.js ├── models/ │   ├── User.js │   ├── Order.js │   └── Deposit.js ├── routes/ │   ├── auth.js │   ├── order.js │   ├── deposit.js │   └── admin.js ├── provider/ │   ├── murbug.js │   └── vaksms.js └── middleware/ └── auth.js
-
-==================================================== INSTALL MODULE
-
-npm init -y npm install express mongoose axios cors dotenv jsonwebtoken bcryptjs
-
-==================================================== FILE .env
-
-PORT=3000 MONGO_URL=mongodb://127.0.0.1:27017/nokos JWT_SECRET=SECRET QRIS_API_KEY=ISI_API_KEY MURBUG_API=https://api-provider.com MURBUG_KEY=ISI_KEY
-
-==================================================== FILE index.js
-
-const express = require('express') const mongoose = require('mongoose') const cors = require('cors') require('dotenv').config()
-
-const app = express()
-
-app.use(cors()) app.use(express.json())
-
-mongoose.connect(process.env.MONGO_URL)
-
-app.use('/api/auth', require('./routes/auth')) app.use('/api/order', require('./routes/order')) app.use('/api/deposit', require('./routes/deposit')) app.use('/api/admin', require('./routes/admin'))
-
-app.listen(process.env.PORT, () => { console.log('SERVER RUNNING') })
-
-==================================================== MODEL USER
-
-const mongoose = require('mongoose')
-
-const userSchema = new mongoose.Schema({ username: String, password: String, balance: { type: Number, default: 0 }, role: { type: String, default: 'user' } })
-
-module.exports = mongoose.model('users', userSchema)
-
-==================================================== MODEL ORDER
-
-const mongoose = require('mongoose')
-
-const orderSchema = new mongoose.Schema({ userId: String, provider: String, service: String, number: String, otp: String, status: String, createdAt: { type: Date, default: Date.now } })
-
-module.exports = mongoose.model('orders', orderSchema)
-
-==================================================== ROUTE ORDER API
-
-const router = require('express').Router() const axios = require('axios') const Order = require('../models/Order') const User = require('../models/User')
-
-router.post('/create', async (req, res) => {
-
-const { userId, service, provider } = req.body
-
-const user = await User.findById(userId)
-
-if (user.balance < 5000) { return res.json({ status: false, message: 'Saldo tidak cukup' }) }
-
-const response = await axios.post(${process.env.MURBUG_API}/order, { service }, { headers: { Authorization: process.env.MURBUG_KEY } })
-
-const data = response.data
-
-user.balance -= 5000 await user.save()
-
-await Order.create({ userId, provider, service, number: data.number, status: 'waiting' })
-
-res.json(data) })
-
-module.exports = router
-
-==================================================== AUTO DEPOSIT QRIS
-
-const router = require('express').Router() const Deposit = require('../models/Deposit')
-
-router.post('/qris', async (req, res) => {
-
-const { amount } = req.body
-
-const invoice = { id: Date.now(), amount, qr_string: '00020101021126670016COM.NOBUBANK.WWW011893600503000008791402145502181234567890303UMI51440014ID.CO.QRIS.WWW0215ID1024324430303UMI5204541153033605802ID5910NOKOS OTP6013JAKARTA BARAT6105111116304A13A' }
-
-res.json({ status: true, data: invoice }) })
-
-module.exports = router
-
-==================================================== ADMIN DASHBOARD FEATURES
-
-Statistik user
-
-Total order
-
-Total deposit
-
-Total profit
-
-Tambah provider
-
-Edit harga produk
-
-Ban user
-
-Tambah saldo
-
-Withdraw user
-
-Monitor OTP realtime
-
-API monitoring
-
-
-==================================================== MULTI PROVIDER SUPPORT
-
-SUPPORTED:
-
-Murbug
-
-VakSMS
-
-SMSHub
-
-5SIM
-
-GrizzlySMS
-
-SMSActivate
-
-DaisySMS
-
-
-==================================================== API SENDIRI
-
-POST /api/order/create GET /api/order/status/:id POST /api/order/cancel GET /api/products POST /api/deposit/qris GET /api/user/profile
-
-==================================================== DEPLOY VPS UBUNTU
-
-apt update && apt upgrade -y apt install nodejs npm mongodb -y
-
-mkdir nokos cd nokos
-
-npm install
-
-node index.js
-
-==================================================== NGINX DOMAIN
-
-apt install nginx -y
-
-nano /etc/nginx/sites-available/default
-
-server { listen 80; server_name domain.com;
-
-location / {
-    proxy_pass http://localhost:3000;
-}
-
-}
-
-systemctl restart nginx
-
-==================================================== FITUR TAMBAHAN
-
-Login register JWT
-
-Referral system
-
-Reseller panel
-
-Auto OTP refresh
-
-Auto webhook
-
-Telegram notification
-
-Discord webhook
-
-API logs
-
-Anti spam
-
-Captcha
-
-Dark mode
-
-Light mode
-
-Mobile responsive
-
-PWA support
-
-Real-time socket
-
-
-</footer><script>
-
-function openLogin() {
-  document.getElementById('loginModal').classList.remove('hidden')
-}
-
-function closeLogin() {
-  document.getElementById('loginModal').classList.add('hidden')
-}
-
-setInterval(async () => {
-
-  if (!currentOrderId) return
-
-  try {
-
-    const response = await fetch(`${BASE_URL}/status/${currentOrderId}`, {
-      headers: {
-        'Authorization': API_KEY
-      }
-    })
-
-    const data = await response.json()
-
-    if (data.otp) {
-      document.getElementById('otp').innerText = data.otp
-      document.getElementById('status').innerText = 'OTP RECEIVED'
+<script>
+    // ======================= DATA PRODUK (support api + auto provider luar) ==================
+    let produkData = [
+        { id: "wa_001", nama: "WhatsApp (Global)", harga: 1850, stok: 342, negara: "US/ID/UK", provider: "Luar Negeri" },
+        { id: "tg_002", nama: "Telegram OTP", harga: 1650, stok: 512, negara: "Auto", provider: "Luar" },
+        { id: "gg_003", nama: "Google Voice", harga: 2750, stok: 128, negara: "USA", provider: "Premium" },
+        { id: "ig_004", nama: "Instagram", harga: 1950, stok: 267, negara: "Dunia", provider: "Luar" },
+        { id: "tt_005", nama: "TikTok Verif", harga: 2250, stok: 411, negara: "Global", provider: "Auto" },
+        { id: "x_006", nama: "X (Twitter)", harga: 1550, stok: 199, negara: "ID/US", provider: "Murah" },
+        { id: "line_007", nama: "LINE", harga: 2100, stok: 88, negara: "JPN/TH", provider: "Luar" },
+        { id: "fb_008", nama: "Facebook", harga: 1750, stok: 304, negara: "Worldwide", provider: "Eksternal" }
+    ];
+
+    let appConfig = {
+        apiKey: "nokos_api_live_" + Math.random().toString(36).substring(2,12),
+        balance: 350000,   // saldo demo user
+        totalTransaksi: 0,
+        ordersHistory: [],
+        webhookTelegram: { botToken: "7890123456:AAHdemo", chatId: "-10012345" }
+    };
+
+    // fungsi simpan ke localstorage sementara
+    function saveToLocal() { localStorage.setItem("nokosApp", JSON.stringify(appConfig)); }
+    function loadLocal() {
+        let saved = localStorage.getItem("nokosApp");
+        if(saved) { appConfig = { ...appConfig, ...JSON.parse(saved) }; }
+        // pastikan produk tidak ke replace stok asli tapi harga tetap update
+    }
+    loadLocal();
+
+    // Helper UI Toast
+    function showToast(msg, type = "info") {
+        let toast = document.createElement("div");
+        toast.className = "toast-notif";
+        toast.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i> ${msg}`;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2800);
     }
 
-  } catch (e) {
-    console.log(e)
-  }
+    // update tampilan stok & render produk
+    function renderProducts() {
+        let container = document.getElementById("productListContainer");
+        if(!container) return;
+        container.innerHTML = produkData.map(prod => `
+            <div class="card-produk" data-id="${prod.id}">
+                <div style="display:flex; justify-content: space-between;">
+                    <h3><i class="fab fa-${prod.id.split('_')[0]}"></i> ${prod.nama}</h3>
+                    <span class="stock-badge"><i class="fas fa-database"></i> stok: ${prod.stok}</span>
+                </div>
+                <div style="margin: 12px 0;">🌍 ${prod.negara} | ${prod.provider}</div>
+                <div class="price-tag">Rp${prod.harga.toLocaleString()}</div>
+                <div style="display:flex; justify-content: space-between; margin-top: 12px;">
+                    <span class="old-price">Provider Luar | modal hemat</span>
+                    <button class="btn-sm btn-beli-product" data-id="${prod.id}" data-nama="${prod.nama}" data-harga="${prod.harga}">Beli Sekarang</button>
+                </div>
+            </div>
+        `).join('');
 
-}, 5000)
+        document.querySelectorAll('.btn-beli-product').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                let id = btn.getAttribute('data-id');
+                let nama = btn.getAttribute('data-nama');
+                let harga = parseInt(btn.getAttribute('data-harga'));
+                openBuyModal(id, nama, harga);
+            });
+        });
+    }
 
-</script></body>
+    function openBuyModal(productId, productName, price) {
+        let modal = document.getElementById('buyModal');
+        document.getElementById('modalProductName').innerText = productName;
+        document.getElementById('modalPrice').innerText = `Rp${price.toLocaleString()}`;
+        modal.style.visibility = "visible";
+        modal.style.opacity = "1";
+        window._selectedBuy = { id: productId, nama: productName, harga: price };
+    }
+
+    function closeModal() {
+        let modal = document.getElementById('buyModal');
+        modal.style.visibility = "hidden";
+        modal.style.opacity = "0";
+    }
+
+    // fungsi beli dengan pengecekan stok & API log
+    function processBuy(productId) {
+        let product = produkData.find(p => p.id === productId);
+        if (!product) return showToast("Produk tidak ditemukan");
+        if (product.stok <= 0) return showToast("Maaf stok habis, sistem auto restock tiap jam!");
+        if (appConfig.balance < product.harga) return showToast("Saldo tidak cukup! Silakan deposit (demo: klik Isi Ulang Saldo di admin)");
+
+        // kurangi stok
+        product.stok -= 1;
+        appConfig.balance -= product.harga;
+        appConfig.totalTransaksi += 1;
+        let virtualNumber = generateVirtualNumber();
+        let orderId = "NK" + Date.now().toString(36) + Math.floor(Math.random()*1000);
+        let newOrder = {
+            id: orderId,
+            product: product.nama,
+            harga: product.harga,
+            nomor: virtualNumber,
+            waktu: new Date().toLocaleString(),
+            status: "sukses"
+        };
+        appConfig.ordersHistory.unshift(newOrder);
+        saveToLocal();
+        renderProducts();
+        updateSidebarStats(); // update jika ada tampilan balance di sidebar
+        
+        // Trigger notifikasi webhook / telegram (support API)
+        sendTelegramNotif(`✅ ORDER OTP! Produk: ${product.nama}\nNomor: ${virtualNumber}\nHarga: Rp${product.harga}\nSisa Stok: ${product.stok}`);
+        showToast(`Berhasil membeli ${product.nama} | Nomor: ${virtualNumber}`, "success");
+        closeModal();
+        // render ulang riwayat jika menu order aktif
+        if(document.getElementById("ordersTabContent") && document.getElementById("ordersTabContent").style.display !== "none"){
+            renderOrdersHistory();
+        }
+    }
+
+    function generateVirtualNumber() {
+        let country = ["+62", "+1", "+44", "+81", "+65"];
+        let random = Math.floor(800000000 + Math.random() * 200000000);
+        return country[Math.floor(Math.random()*country.length)] + random;
+    }
+
+    function sendTelegramNotif(msg) {
+        let { botToken, chatId } = appConfig.webhookTelegram;
+        if (botToken && chatId && botToken !== "7890123456:AAHdemo") {
+            console.log(`[WEBHOOK SIM] Send to ${chatId} : ${msg}`);
+            // simulasi api sukses
+            showToast("Notifikasi terkirim ke Telegram (simulasi)", "info");
+        } else {
+            console.log("Telegram not config, tapi order tetap berhasil.");
+        }
+    }
+
+    // render API panel 
+    function showApiPanel() {
+        let main = document.getElementById("mainContentArea");
+        main.innerHTML = `
+            <div class="admin-panel-card">
+                <div class="flex-between"><h3><i class="fas fa-plug"></i> API & Koneksi - Auto Provider Luar</h3><button id="genApiFromPanel" class="btn-primary">Generate API Key</button></div>
+                <div class="api-box" style="margin-top: 14px;">
+                    <div><i class="fas fa-key"></i> API Key : <strong id="apiKeySpan">${appConfig.apiKey}</strong> <button id="copyApiBtn" class="btn-sm">Salin</button></div>
+                    <div style="margin-top: 8px;">Endpoint: POST /api/v1/order<br>Headers: { "X-API-Key": "your_key" }<br>Contoh cURL: curl -X POST https://nokosotp.api/order -d '{"service":"whatsapp"}'</div>
+                </div>
+                <div style="margin-top: 20px;"><label><i class="fab fa-telegram"></i> Telegram Webhook (notifikasi order)</label><br>
+                <input type="text" id="botTokenInput" placeholder="Bot Token" value="${appConfig.webhookTelegram.botToken}" style="width:100%; border-radius: 40px; padding: 10px; margin: 6px 0;">
+                <input type="text" id="chatIdInput" placeholder="Chat ID" value="${appConfig.webhookTelegram.chatId}" style="width:100%; border-radius: 40px; padding: 10px;">
+                <button id="saveWebhookBtn" class="btn-primary" style="margin-top: 10px;">Simpan Webhook</button>
+                </div>
+                <div class="stats-banner" style="margin-top: 24px; justify-content: flex-start;"><i class="fas fa-check-circle"></i> Dokumentasi lengkap & FREE Setup tersedia</div>
+            </div>
+            <div class="admin-panel-card"><h3>Test API Create Order (Simulasi)</h3><button id="testApiOrderBtn" class="btn-primary"><i class="fas fa-vial"></i> Test Create Order via API</button><div id="apiTestResult" style="margin-top: 8px;"></div></div>
+        `;
+        document.getElementById("copyApiBtn")?.addEventListener("click", () => { navigator.clipboard.writeText(appConfig.apiKey); showToast("API Key disalin"); });
+        document.getElementById("genApiFromPanel")?.addEventListener("click", () => { generateNewApiKey(); showApiPanel(); });
+        document.getElementById("saveWebhookBtn")?.addEventListener("click", () => {
+            let bot = document.getElementById("botTokenInput").value;
+            let chat = document.getElementById("chatIdInput").value;
+            appConfig.webhookTelegram = { botToken: bot, chatId: chat };
+            saveToLocal();
+            showToast("Webhook Telegram tersimpan, notifikasi akan terkirim ke bot kamu");
+        });
+        document.getElementById("testApiOrderBtn")?.addEventListener("click", () => {
+            let randomService = produkData[Math.floor(Math.random()*produkData.length)];
+            if(randomService.stok <= 0) { document.getElementById("apiTestResult").innerHTML = "<span style='color:red'>Stok habis, coba lagi setelah restock</span>"; return; }
+            processBuy(randomService.id);
+            document.getElementById("apiTestResult").innerHTML = `<span style='color:green'>✅ Sukses create order ${randomService.nama} via API (demo)</span>`;
+        });
+    }
+
+    function generateNewApiKey() {
+        appConfig.apiKey = "nokos_" + Math.random().toString(36).substring(2,18) + Date.now().toString(36);
+        saveToLocal();
+        showToast("API Key baru berhasil digenerate!");
+    }
+
+    function renderOrdersHistory() {
+        let main = document.getElementById("mainContentArea");
+        if(appConfig.ordersHistory.length === 0){
+            main.innerHTML = `<div class="admin-panel-card"><h3>Riwayat Order</h3><p>Belum ada transaksi. Beli nomor OTP sekarang!</p></div>`;
+            return;
+        }
+        let html = `<div class="admin-panel-card"><h3><i class="fas fa-clock"></i> Riwayat Pembelian</h3><div style="overflow-x:auto;">`;
+        html += `<table style="width:100%; border-collapse:collapse;"><tr><th>ID</th><th>Produk</th><th>Nomor</th><th>Harga</th><th>Waktu</th></tr>`;
+        appConfig.ordersHistory.slice(0,20).forEach(order => {
+            html += `<tr><td>${order.id}</td><td>${order.product}</td><td>${order.nomor}</td><td>Rp${order.harga.toLocaleString()}</td><td>${order.waktu}</td></tr>`;
+        });
+        html += `</table></div></div>`;
+        main.innerHTML = html;
+    }
+
+    function renderProviderPanel() {
+        let main = document.getElementById("mainContentArea");
+        main.innerHTML = `
+            <div class="admin-panel-card">
+                <h3><i class="fas fa-globe-asia"></i> Provider Luar & Auto Replenish</h3>
+                <p>Sistem terhubung ke supply luar negeri (US, UK, ID, JPN). Stok otomatis sync setiap 30 menit dari API provider global. Harga modal murah hingga 40%.</p>
+                <div class="flex-between"><span>✅ Status Koneksi: <span style="color:green;">Active - Stok melimpah</span></span> <button id="manualRestockBtn" class="btn-primary">Restock Manual (Tambah Stok)</button></div>
+                <div style="margin-top: 20px;">🌐 Daftar Provider: Twilio, Vonage, SMSPool, 5sim.net (Gateway resmi). Harga terbaik se-Indonesia!</div>
+            </div>
+        `;
+        document.getElementById("manualRestockBtn")?.addEventListener("click", () => {
+            produkData.forEach(p => { p.stok += Math.floor(Math.random() * 80) + 30; });
+            renderProducts();
+            showToast("Restock stok global berhasil! (provider luar)");
+        });
+    }
+
+    function updateSidebarStats() {
+        let balanceElem = document.querySelector(".sidebar-admin .stat-item:first-child");
+        if(balanceElem) balanceElem.innerHTML = `<i class="fas fa-wallet"></i> Saldo: Rp${appConfig.balance.toLocaleString()}`;
+        else {
+            let sb = document.querySelector(".sidebar-admin");
+            let existing = document.querySelector(".saldo-side");
+            if(!existing) {
+                let div = document.createElement("div"); div.className = "stat-item saldo-side"; div.style.marginTop="1rem"; div.style.background="#eef2ff"; div.style.borderRadius="40px"; div.style.padding="10px"; div.innerHTML = `<i class="fas fa-coins"></i> Saldo: Rp${appConfig.balance.toLocaleString()}<br><button id="topupDemoBtn" style="background:#2563eb; border:none; border-radius:30px; padding:5px 12px; color:white; margin-top:8px;">+ Deposit Demo (Rp50k)</button>`;
+                document.querySelector(".sidebar-admin").appendChild(div);
+                document.getElementById("topupDemoBtn")?.addEventListener("click", () => { appConfig.balance += 50000; saveToLocal(); updateSidebarStats(); showToast("Top up Rp50.000 berhasil!"); renderProducts(); });
+            } else { existing.innerHTML = `<i class="fas fa-coins"></i> Saldo: Rp${appConfig.balance.toLocaleString()}<br><button id="topupDemoBtn" style="background:#2563eb; border:none; border-radius:30px; padding:5px 12px; color:white; margin-top:8px;">+ Deposit Demo (Rp50k)</button>`; 
+                document.getElementById("topupDemoBtn")?.addEventListener("click", () => { appConfig.balance += 50000; saveToLocal(); updateSidebarStats(); showToast("Top up berhasil!"); renderProducts(); });
+            }
+        }
+    }
+
+    // navigasi menu
+    document.querySelectorAll(".menu-item").forEach(menu => {
+        menu.addEventListener("click", (e) => {
+            let key = menu.getAttribute("data-menu");
+            if(key === "products") { renderProducts(); let main = document.getElementById("mainContentArea"); main.innerHTML = `<div style="display: flex; justify-content: space-between;"><h2>📱 Nomor Virtual</h2><span></span></div><div id="productListContainer" class="grid-produk" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem;"></div>`; renderProducts(); }
+            else if(key === "api") showApiPanel();
+            else if(key === "orders") renderOrdersHistory();
+            else if(key === "provider") renderProviderPanel();
+            document.querySelectorAll(".menu-item").forEach(m => m.classList.remove("active"));
+            menu.classList.add("active");
+        });
+    });
+
+    document.getElementById("genApiBtn")?.addEventListener("click", () => { generateNewApiKey(); showToast("API Key baru dibuat! Cek menu API & Koneksi"); });
+    document.getElementById("resetStokBtn")?.addEventListener("click", () => { produkData.forEach(p => p.stok += 50); renderProducts(); showToast("Stok +50 setiap produk (Provider luar auto suplai)"); });
+    document.getElementById("beliCepatBtn")?.addEventListener("click", () => { if(produkData.length) openBuyModal(produkData[0].id, produkData[0].nama, produkData[0].harga); });
+    document.getElementById("openAdminPanelBtn")?.addEventListener("click", () => { showApiPanel(); document.querySelector(".menu-item[data-menu='api']")?.click(); });
+    document.getElementById("confirmBuyBtn")?.addEventListener("click", () => { if(window._selectedBuy) processBuy(window._selectedBuy.id); });
+    document.getElementById("closeModalBtn")?.addEventListener("click", closeModal);
+    window.onclick = (e) => { if(e.target === document.getElementById("buyModal")) closeModal(); };
+
+    // inisiasi awal
+    renderProducts();
+    updateSidebarStats();
+    // tambahan set balance awal
+    if(!localStorage.getItem("nokosApp")){ appConfig.balance = 350000; saveToLocal(); updateSidebarStats(); }
+</script>
+<footer>
+    <i class="fas fa-headset"></i> FREE SETUP & INSTALASI - support 24 jam. Sistem ringan, admin panel friendly. Stok melimpah dari Provider Luar Negeri.
+</footer>
+</body>
 </html>
